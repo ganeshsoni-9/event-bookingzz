@@ -86,6 +86,12 @@ exports.login = async (req, res) => {
             });
         }
 
+        if (user.isActive === false) {
+            return res.status(403).json({
+                error: 'Your account has been deactivated. Please contact support.'
+            });
+        }
+
         const isMatch = await bcrypt.compare(
             password,
             user.password
@@ -166,6 +172,12 @@ exports.verifyOTP = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 message: "User not found"
+            });
+        }
+
+        if (user.isActive === false) {
+            return res.status(403).json({
+                message: 'Your account has been deactivated. Please contact support.'
             });
         }
 

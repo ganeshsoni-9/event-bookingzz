@@ -4,16 +4,19 @@ const User = require('../models/User');
 const protect = async (req, res, next) => {
     let token;
 
-    // Check Authorization header
+    // Check Authorization header (case-insensitive) or query parameter
     if (
         req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer')
+        req.headers.authorization.toLowerCase().startsWith('bearer')
     ) {
         token = req.headers.authorization.split(" ")[1];
+    } else if (req.query.token) {
+        token = req.query.token;
     }
 
     // No token
     if (!token) {
+        console.warn(`[Auth Check] Blocked unauthorized access to ${req.originalUrl}: No token provided.`);
         return res.status(401).json({
             message: 'Not authorized, no token'
         });
@@ -29,6 +32,12 @@ const protect = async (req, res, next) => {
         if (!req.user) {
             return res.status(401).json({
                 message: 'Not authorized, user not found'
+            });
+        }
+
+        if (req.user.isActive === false) {
+            return res.status(403).json({
+                message: 'Your account has been deactivated. Please contact support.'
             });
         }
 
