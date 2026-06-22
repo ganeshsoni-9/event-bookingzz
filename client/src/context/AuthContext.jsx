@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
             return data;
         } catch (error) {
             if (error.response?.data?.needsVerification) throw error.response.data;
-            throw error.response?.data?.message || 'Login failed';
+            throw error.response?.data?.error || error.response?.data?.message || 'Login failed';
         }
     };
     
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', data.token);
             return data;
         } catch (error) {
-            throw error.response?.data?.message || 'OTP verification failed';
+            throw error.response?.data?.error || error.response?.data?.message || 'OTP verification failed';
         }
     };
 
