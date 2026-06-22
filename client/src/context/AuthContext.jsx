@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
             throw error.response?.data?.message || 'Login failed';
         }
     };
+    
 
     const register = async (name, email, password) => {
         try {
