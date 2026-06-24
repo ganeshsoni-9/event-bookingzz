@@ -30,7 +30,7 @@ const Navbar = () => {
             className="flex items-center gap-2 text-white text-xl sm:text-2xl font-bold"
           >
             <FaTicketAlt />
-            <span>Eventora</span>
+            <span>EventAdda</span>
           </Link>
 
           {/* Desktop Menu */}
