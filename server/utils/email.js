@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// Create Transporter (Using correct .env keys)
+// Create Transporter
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -21,6 +21,9 @@ transporter.verify((error, success) => {
   }
 });
 
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
+
 // =======================
 // Booking Confirmation Email
 // =======================
@@ -33,10 +36,19 @@ async function sendBookingEmail(userEmail, userName, eventTitle) {
       html: `
         <div style="font-family: Arial, sans-serif; max-width:600px; margin:auto; padding:20px; border:1px solid #eee;">
           <h2>Hello ${userName} 👋</h2>
-          <p>Your booking for the event <strong>${eventTitle}</strong> has been confirmed successfully.</p>
+
+          <p>Your booking for the event
+            <strong>${eventTitle}</strong>
+            has been confirmed successfully.
+          </p>
+
           <p>Thank you for choosing <strong>Eventora</strong>.</p>
+
           <br>
-          <p style="color:#777;">We look forward to seeing you at the event.</p>
+
+          <p style="color:#777;">
+            We look forward to seeing you at the event.
+          </p>
         </div>
       `,
     };
@@ -53,7 +65,7 @@ async function sendBookingEmail(userEmail, userName, eventTitle) {
 // =======================
 async function sendOTPEmail(toEmail, otp, type = "account_verification") {
   try {
-    const isAccountVerification = type === "account_verification" || type === "account_Verification";
+    const isAccountVerification = type === "account_verification";
 
     const subject = isAccountVerification
       ? "Your Account Verification OTP"
@@ -73,28 +85,48 @@ async function sendOTPEmail(toEmail, otp, type = "account_verification") {
       subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width:500px; margin:auto; padding:20px; border:1px solid #eee; border-radius:8px;">
+          
           <h2 style="text-align:center;">${heading}</h2>
+
           <p>${message}</p>
-          <div style="text-align:center; background:#f5f5f5; padding:15px; margin:20px 0; border-radius:6px;">
-            <span style="font-size:32px; letter-spacing:6px; font-weight:bold; color:#2e7d32;">
+
+          <div style="
+            text-align:center;
+            background:#f5f5f5;
+            padding:15px;
+            margin:20px 0;
+            border-radius:6px;
+          ">
+            <span style="
+              font-size:32px;
+              letter-spacing:6px;
+              font-weight:bold;
+              color:#2e7d32;
+            ">
               ${otp}
             </span>
           </div>
+
           <p>This OTP will expire in <strong>10 minutes</strong>.</p>
-          <p style="font-size:12px; color:#888;">If you didn't request this OTP, please ignore this email.</p>
+
+          <p style="font-size:12px; color:#888;">
+            If you didn't request this OTP, please ignore this email.
+          </p>
         </div>
       `,
     };
 
     await transporter.sendMail(mailOptions);
+
     console.log(`OTP sent successfully to ${toEmail} (${type})`);
   } catch (error) {
     console.error("Error sending OTP email:", error);
-    throw error; // Isse controller ko pata chalega agar mail fail hua toh
   }
 }
 
-// Object export taaki destructuring kaam kare
+// =======================
+// Exports
+// =======================
 module.exports = {
   sendBookingEmail,
   sendOTPEmail,
