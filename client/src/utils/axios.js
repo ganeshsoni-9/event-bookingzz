@@ -1,33 +1,6 @@
-import axios from 'axios';
-
-const api = axios.create({
-    baseURL: 'https://event-bookingzz.onrender.com/api',
-    headers: {
-        'Content-Type': 'application/json'
-    }
-});
-
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token && token !== 'undefined' && token !== 'null') {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
-// Auto-logout if token is expired (401) or account is deactivated (403)
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            localStorage.removeItem('userInfo');
-            localStorage.removeItem('token');
-            if (!window.location.pathname.includes('/login')) {
-                window.location.href = '/login';
-            }
-        }
-        return Promise.reject(error);
-    }
-);
-
-export default api;
+PORT=5000
+MONGODB_URI=mongodb+srv://ganeshsonirmg18:ganesh2004@cluster0.gj1ha5f.mongodb.net/EVENTBOOKING?retryWrites=true&w=majority
+EMAIL_USER=ganeshsonirmg18@gmail.com
+EMAIL_PASS=xkvd pyha dodj wvfo
+JWT_SECRET=ccca9afc6d01c90f281707bf3e31983a70a2a39fb7617845b54991d157d5c3de
+RESEND_API_KEY=re_H4U9VDL3_CFZV2s9LmVUQzVUvkMm4XmhQ

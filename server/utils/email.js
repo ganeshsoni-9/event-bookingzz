@@ -1,30 +1,15 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const dotenv = require("dotenv");
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-// Verify SMTP
-transporter.verify((error) => {
-  if (error) {
-    console.error("SMTP Error:", error);
-  } else {
-    console.log("SMTP Server Ready");
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Booking Confirmation Email
 const sendBookingEmail = async (userEmail, userName, eventTitle) => {
   try {
-    await transporter.sendMail({
-      from: `"Eventora" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: "Eventora <onboarding@resend.dev>",
       to: userEmail,
       subject: `Booking Confirmed - ${eventTitle}`,
       html: `
@@ -62,8 +47,8 @@ const sendOTPEmail = async (
       ? "Use the OTP below to verify your Eventora account."
       : "Use the OTP below to verify your event booking.";
 
-    await transporter.sendMail({
-      from: `"Eventora" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: "Eventora <onboarding@resend.dev>",
       to: userEmail,
       subject,
       html: `
