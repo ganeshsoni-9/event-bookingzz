@@ -50,14 +50,14 @@ exports.registerUser = async (req, res) => {
         // Delete old OTP
         await OTP.deleteMany({
             email,
-            state: "account_Verification"
+            state: "account_verification"
         });
 
         // Save new OTP
         await OTP.create({
             email,
             otp,
-            state: "account_Verification"
+            state: "account_verification"
         });
 
         // Send OTP email
@@ -121,13 +121,13 @@ exports.login = async (req, res) => {
 
             await OTP.deleteMany({
                 email,
-                state: 'account_Verification'
+                state: 'account_verification'
             });
 
             await OTP.create({
                 email,
                 otp,
-                state: 'account_Verification'
+                state: 'account_verification'
             });
             await sendOTPEmail(
                 email,
@@ -135,10 +135,10 @@ exports.login = async (req, res) => {
                 'account_verification'
             );
 
-            return res.status(400).json({
-                error:
-                    'Account not verified. A new OTP has been sent to your email.'
-            });
+           return res.status(400).json({
+    error: "Account not verified. A new OTP has been sent to your email.",
+    needsVerification: true
+});
         }
 
         res.json({
@@ -168,7 +168,7 @@ exports.verifyOTP = async (req, res) => {
         const otpRecord = await OTP.findOne({
             email,
             otp,
-            state: "account_Verification"
+            state: "account_verification"
         });
 
         if (!otpRecord) {
@@ -197,7 +197,7 @@ exports.verifyOTP = async (req, res) => {
         // OTP delete after verification
         await OTP.deleteMany({
             email,
-            state: "account_Verification"
+            state: "account_verification"
         });
 
         res.status(200).json({
