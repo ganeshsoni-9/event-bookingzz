@@ -13,61 +13,71 @@ const generateToken = (id, role) => {
 };
 
 // Register User
+// Register User
 exports.registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        const userExists = await User.findOne({ email });
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
 
-        if (userExists) {
+        if (existingUser) {
             return res.status(400).json({
-                error: 'User already exists'
+                error: "User already exists"
             });
         }
 
+        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Create user
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
-            role: 'user',
+            role: "user",
             isVerified: false
         });
 
+        // Generate OTP
         const otp = Math.floor(
             100000 + Math.random() * 900000
         ).toString();
 
         console.log(`OTP for ${email}: ${otp}`);
 
-        // Delete old OTPs
+        // Delete old OTP
         await OTP.deleteMany({
             email,
-            state: 'account_Verification'
+            state: "account_Verification"
         });
 
+        // Save new OTP
         await OTP.create({
             email,
             otp,
-            state: 'account_Verification'
+            state: "account_Verification"
         });
 
+        // Send OTP email
         await sendOTPEmail(
             email,
             otp,
-            'account_verification'
+            "account_verification"
         );
 
-        res.status(201).json({
+        // Success response
+        return res.status(201).json({
             message:
-                'User registered successfully. Please check your email for OTP to verify your account.',
+                "User registered successfully. Please check your email for OTP to verify your account.",
             email: user.email
         });
 
     } catch (error) {
-        res.status(400).json({
+        console.error("Register Error:", error);
+
+        return res.status(500).json({
             error: error.message
         });
     }
