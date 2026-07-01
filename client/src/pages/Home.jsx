@@ -42,15 +42,14 @@ const Home = () => {
                     </span>
 
                     <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black mb-6 leading-tight tracking-tight drop-shadow-lg">
-                        Find Your Next <br />
+                        Experience Events Like Never Before<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">
                             Unforgettable
                         </span> Experience
                     </h1>
 
                     <p className="text-gray-300 text-base sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-                        Discover the best tech conferences, late-night music festivals, and hands-on workshops happening directly in your area. Secure your spot today.
-                    </p>
+Browse the latest concerts, conferences, workshops, and entertainment events. Find your perfect experience and book your tickets in just a few clicks.                    </p>
 
                     <div className="w-full max-w-2xl mx-auto relative flex items-center shadow-2xl group">
                         <FaSearch className="absolute left-6 text-gray-500 text-xl group-focus-within:text-black transition-colors" />
