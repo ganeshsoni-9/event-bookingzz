@@ -15,8 +15,8 @@ const otpSchema = new mongoose.Schema({
 
     state: {
         type: String,
-        enum: ['account_Verification', 'event_booking'],
-        default: 'account_Verification' // Default value
+        enum: ['account_verification', 'event_booking'],
+        default: 'account_verification' // Default value
     },
 
     createdAt: {
