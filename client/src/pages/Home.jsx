@@ -27,7 +27,13 @@ const Home = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen">
+<div
+    className="flex flex-col min-h-screen bg-cover bg-center bg-fixed"
+    style={{
+        backgroundImage:
+            "linear-gradient(rgba(15, 23, 42, 0.70), rgba(15, 23, 42, 0.70)), url('/college-bg.jpeg')"
+    }}
+>
 
             {/* HERO SECTION */}
             <div className="relative bg-black text-white rounded-3xl overflow-hidden mb-12 shadow-2xl">
@@ -38,18 +44,21 @@ const Home = () => {
                 <div className="relative p-6 sm:p-10 md:p-20 text-center flex flex-col items-center z-10">
 
                     <span className="bg-white/20 text-white backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6 border border-white/20">
-                        Welcome to Eventora
+                        Welcome to Sobhasaria Event Adda
                     </span>
 
-                    <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black mb-6 leading-tight tracking-tight drop-shadow-lg">
-                        Experience Events Like Never Before<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">
-                            Unforgettable
-                        </span> Experience
-                    </h1>
+     <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black mb-6 leading-tight tracking-tight drop-shadow-lg">
+    Discover Campus Events Like Never Before<br />
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">
+        Unforgettable
+    </span> College Experiences
+</h1>
 
-                    <p className="text-gray-300 text-base sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-Browse the latest concerts, conferences, workshops, and entertainment events. Find your perfect experience and book your tickets in just a few clicks.                    </p>
+<p className="text-gray-300 text-base sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+    Explore upcoming college events, workshops, seminars, cultural programs,
+    technical competitions, and more. Find your favorite event and book your
+    seat quickly and easily.
+</p>
 
                     <div className="w-full max-w-2xl mx-auto relative flex items-center shadow-2xl group">
                         <FaSearch className="absolute left-6 text-gray-500 text-xl group-focus-within:text-black transition-colors" />
@@ -69,31 +78,60 @@ Browse the latest concerts, conferences, workshops, and entertainment events. Fi
             {/* FEATURES */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 px-4">
 
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:-translate-y-1 transition">
-                    <div className="w-16 h-16 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl mb-6">
-                        <FaRegClock />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Fast Booking</h3>
-                    <p className="text-gray-500 text-sm">Secure your tickets instantly.</p>
-                </div>
+    {/* CARD 1 */}
+    <div className="group bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-md border border-gray-200 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl">
 
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:-translate-y-1 transition">
-                    <div className="w-16 h-16 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl mb-6">
-                        <FaTicketAlt />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Seamless Access</h3>
-                    <p className="text-gray-500 text-sm">Manage tickets easily.</p>
-                </div>
+        <div className="w-16 h-16 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-indigo-600">
+            <FaRegClock />
+        </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:-translate-y-1 transition">
-                    <div className="w-16 h-16 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl mb-6">
-                        <FaShieldAlt />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Secure Platform</h3>
-                    <p className="text-gray-500 text-sm">Safe & verified bookings.</p>
-                </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-3 transition-colors duration-300 group-hover:text-indigo-600">
+            Easy Event Booking
+        </h3>
 
-            </div>
+        <p className="text-gray-500 text-sm leading-relaxed">
+            Book your favorite college events quickly and secure your seat in just a few clicks.
+        </p>
+
+    </div>
+
+
+    {/* CARD 2 */}
+    <div className="group bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-md border border-gray-200 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl">
+
+        <div className="w-16 h-16 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 transition-all duration-300 group-hover:scale-110 group-hover:-rotate-6 group-hover:bg-blue-600">
+            <FaTicketAlt />
+        </div>
+
+        <h3 className="text-xl font-bold text-gray-900 mb-3 transition-colors duration-300 group-hover:text-blue-600">
+            Digital Event Pass
+        </h3>
+
+        <p className="text-gray-500 text-sm leading-relaxed">
+            Access your event bookings and manage your digital tickets easily from one place.
+        </p>
+
+    </div>
+
+
+    {/* CARD 3 */}
+    <div className="group bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-md border border-gray-200 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl">
+
+        <div className="w-16 h-16 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-emerald-600">
+            <FaShieldAlt />
+        </div>
+
+        <h3 className="text-xl font-bold text-gray-900 mb-3 transition-colors duration-300 group-hover:text-emerald-600">
+            Verified College Events
+        </h3>
+
+        <p className="text-gray-500 text-sm leading-relaxed">
+            Discover trusted college events with secure and reliable registration for students.
+        </p>
+
+    </div>
+
+</div>
 
             {/* HEADER */}
             <div className="flex items-center justify-between mb-8 px-2 border-b border-gray-200 pb-4">

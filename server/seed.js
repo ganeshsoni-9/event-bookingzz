@@ -25,112 +25,159 @@ const users = [
 // ---------------- EVENTS ----------------
 const events = [
     {
-        title: 'React & Node.js Developer Retreat',
-        description: 'Join us for full-stack development training.',
-        date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-        location: 'Silicon Valley, CA',
-        category: 'technology',
-        totalSeats: 100,
-        ticketPrice: 800,
-        imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800'
-    },
-    {
-        title: 'Neon Nights EDM Festival',
-        description: 'Biggest EDM festival of the year.',
-        date: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
-        location: 'New York',
-        category: 'music',
-        totalSeats: 450,
-        ticketPrice: 1500,
-        imageUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800'
-    },
-{
-        title: 'Web Development Workshop',
-        description: 'Learn HTML, CSS, JavaScript and React from experts.',
+        title: 'TechFest - Annual Technical Festival',
+        description:
+            'A grand technical festival featuring coding competitions, robotics, project exhibitions, quizzes and innovative technology challenges for students.',
         date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-        location: 'Jaipur, Rajasthan',
+        location: 'Sobhasaria Group of Institutions, Sikar, Rajasthan',
         category: 'technology',
-        totalSeats: 80,
+        totalSeats: 500,
+        ticketPrice: 800,
+        imageUrl:
+            'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800'
+    },
+
+    {
+        title: 'Annual Cultural Fest',
+        description:
+            'A colorful college cultural festival featuring dance, singing, fashion shows, drama, music and exciting student performances.',
+        date: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000),
+        location: 'Sobhasaria Group of Institutions, Sikar, Rajasthan',
+        category: 'cultural',
+        totalSeats: 800,
         ticketPrice: 500,
-        imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3'
+        imageUrl:
+            'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&q=80&w=800'
     },
 
     {
-        title: 'Career Guidance Seminar',
-        description: 'Get guidance about jobs, internships and placements.',
-        date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        location: 'Udaipur, Rajasthan',
-        category: 'education',
-        totalSeats: 120,
-        ticketPrice: 200,
-        imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f'
-    },
-
-    {
-        title: 'Digital Marketing Masterclass',
-        description: 'Learn SEO, Social Media Marketing and Branding.',
+        title: 'Coding Competition - Code Battle',
+        description:
+            'Test your programming skills in an exciting coding competition covering problem solving, algorithms, data structures and logical challenges.',
         date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-        location: 'Delhi',
-        category: 'business',
-        totalSeats: 100,
-        ticketPrice: 600,
-        imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f'
-    },
-
-    {
-        title: 'Fitness & Yoga Session',
-        description: 'Morning yoga and fitness training for a healthy lifestyle.',
-        date: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000),
-        location: 'Ahmedabad, Gujarat',
-        category: 'health',
-        totalSeats: 60,
-        ticketPrice: 300,
-        imageUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a'
-    },
-
-    {
-        title: 'Startup Networking Meetup',
-        description: 'Meet founders, investors and startup enthusiasts.',
-        date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-        location: 'Bangalore, Karnataka',
-        category: 'business',
-        totalSeats: 150,
-        ticketPrice: 1000,
-        imageUrl: 'https://images.unsplash.com/photo-1515169067868-5387ec356754'
-    },
-
-    {
-        title: 'Photography Workshop',
-        description: 'Learn photography basics and editing techniques.',
-        date: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000),
-        location: 'Mumbai, Maharashtra',
-        category: 'creative',
-        totalSeats: 50,
-        ticketPrice: 700,
-        imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32'
-    },
-
-    {
-        title: 'AI & Machine Learning Conference',
-        description: 'Explore the latest trends in Artificial Intelligence.',
-        date: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
-        location: 'Hyderabad, Telangana',
+        location: 'Computer Science Department, Sobhasaria, Sikar',
         category: 'technology',
-        totalSeats: 200,
-        ticketPrice: 1200,
-        imageUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e'
+        totalSeats: 300,
+        ticketPrice: 200,
+        imageUrl:
+            'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&q=80&w=800'
     },
 
     {
-        title: 'Music & Cultural Festival',
-        description: 'Enjoy live music performances and cultural activities.',
-        date: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000),
-        location: 'Jodhpur, Rajasthan',
-        category: 'entertainment',
-        totalSeats: 300,
-        ticketPrice: 400,
-        imageUrl: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a'
+        title: 'Hackathon - Build for Tomorrow',
+        description:
+            'A 24-hour college hackathon where students build innovative solutions using web development, AI, IoT and modern technologies.',
+        date: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000),
+        location: 'Innovation Lab, Sobhasaria Group of Institutions, Sikar',
+        category: 'technology',
+        totalSeats: 250,
+        ticketPrice: 100,
+        imageUrl:
+            'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=800'
     },
+
+    {
+        title: 'Sports Meet - Champions Cup',
+        description:
+            'An exciting inter-college sports event featuring cricket, volleyball, football, badminton, athletics and other sporting activities.',
+        date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+        location: 'Sports Ground, Sobhasaria Group of Institutions, Sikar',
+        category: 'sports',
+        totalSeats: 600,
+        ticketPrice: 50,
+        imageUrl:
+            'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&q=80&w=800'
+    },
+
+    {
+        title: 'Freshers Welcome Party',
+        description:
+            'A special welcome celebration for new students featuring music, dance, fun activities, games and an exciting introduction to campus life.',
+        date: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000),
+        location: 'College Auditorium, Sobhasaria, Sikar',
+        category: 'entertainment',
+        totalSeats: 700,
+        ticketPrice: 500,
+        imageUrl:
+            'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=800'
+    },
+
+    {
+        title: 'Career & Placement Drive',
+        description:
+            'Meet recruiters and industry professionals, explore career opportunities, attend placement sessions and learn about internships and jobs.',
+        date: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
+        location: 'Seminar Hall, Sobhasaria Group of Institutions, Sikar',
+        category: 'career',
+        totalSeats: 400,
+        ticketPrice: 0,
+        imageUrl:
+            'https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&q=80&w=800'
+    },
+
+    {
+        title: 'Project Exhibition & Innovation Expo',
+        description:
+            'Students showcase their innovative academic projects, software applications, engineering models and creative technology solutions.',
+        date: new Date(Date.now() + 22 * 24 * 60 * 60 * 1000),
+        location: 'Main Exhibition Hall, Sobhasaria, Sikar',
+        category: 'innovation',
+        totalSeats: 350,
+        ticketPrice: 150,
+        imageUrl:
+            'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=800'
+    },
+
+    {
+        title: 'AI & Future Technology Seminar',
+        description:
+            'An interactive seminar exploring Artificial Intelligence, Machine Learning, Generative AI, cloud computing and the future of technology.',
+        date: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000),
+        location: 'Conference Hall, Sobhasaria Group of Institutions, Sikar',
+        category: 'technology',
+        totalSeats: 300,
+        ticketPrice: 100,
+        imageUrl:
+            'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800'
+    },
+
+    {
+        title: 'Farewell Celebration - Batch 2026',
+        description:
+            'A memorable farewell celebration for graduating students with cultural performances, memories, awards, music and special moments.',
+        date: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
+        location: 'College Auditorium, Sobhasaria, Sikar',
+        category: 'cultural',
+        totalSeats: 750,
+        ticketPrice: 450,
+        imageUrl:
+            'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&q=80&w=800'
+    },
+    {
+    title: 'Entrepreneurship & Startup Summit',
+    description:
+        'An engaging entrepreneurship summit where students learn about startup ideas, business planning, innovation, funding, leadership and building successful ventures.',
+    date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    location: 'Seminar Hall, Sobhasaria Group of Institutions, Sikar',
+    category: 'business',
+    totalSeats: 300,
+    ticketPrice: 200,
+    imageUrl:
+        'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800'
+},
+
+{
+    title: 'Student Talent & Open Mic Night',
+    description:
+        'A fun student talent evening featuring singing, poetry, stand-up comedy, storytelling, instrumental performances and other creative talents.',
+    date: new Date(Date.now() + 32 * 24 * 60 * 60 * 1000),
+    location: 'College Auditorium, Sobhasaria, Sikar',
+    category: 'entertainment',
+    totalSeats: 500,
+    ticketPrice:250,
+    imageUrl:
+        'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&q=80&w=800'
+},
 ];
 
 // ---------------- SEED ----------------

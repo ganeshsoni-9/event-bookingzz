@@ -24,14 +24,19 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link
-            to="/"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 text-white text-xl sm:text-2xl font-bold"
-          >
-            <FaTicketAlt />
-            <span>EventAdda</span>
-          </Link>
+<Link
+  to="/"
+  onClick={() => setOpen(false)}
+  className="flex items-center gap-3 text-white text-xl sm:text-2xl font-bold"
+>
+  <img
+    src="https://imgs.search.brave.com/Cs91ABjQMmI5oB8HEAN78B8LDH-Om16hzKCMLFNT0Y0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/YWRkcmVzc2VkdS5j/b20vYXNzZXRzL3Vz/ZXJfbG9nby9kYmZl/NGNlNWI2NDc2MWMw/MjIxN2Y2YTI5MTJl/Yjk1NC5qcGVn"
+    alt="Sobhasaria Logo"
+className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-full bg-white p-1 shadow-lg border-2 border-white/30"
+  />
+
+  <span>Sobhasaria EventAdda</span>
+</Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-6">
