@@ -214,7 +214,7 @@ const Home = () => {
 
             {/* FOOTER */}
             <footer className="mt-16 pt-10 border-t text-center text-gray-500 text-sm">
-                © {new Date().getFullYear()} Eventora
+                © {new Date().getFullYear()} Sobhasaria EventAdda. All rights reserved.
             </footer>
 
         </div>
