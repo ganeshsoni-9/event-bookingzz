@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../utils/axios';
 import { AuthContext } from '../context/AuthContext';
+import { QRCodeCanvas } from 'qrcode.react';
 
 import {
     FaCalendarAlt,
@@ -13,8 +14,15 @@ import {
     FaCheckCircle,
     FaShieldAlt,
     FaClock,
-    FaUsers
+    FaUsers,
+    FaQrcode,
+    FaCopy,
+    FaUpload,
+    FaHourglassHalf
 } from 'react-icons/fa';
+
+// ⚠️ Replace with your own UPI ID and QR image (put the QR image in client/public)
+const UPI_ID = '8078623915-2@ybl';
 
 const EventDetail = () => {
     const { id } = useParams();
@@ -28,6 +36,16 @@ const EventDetail = () => {
     const [showOTP, setShowOTP] = useState(false);
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+
+    // ---------------- PAYMENT STATE ----------------
+    const [showPayment, setShowPayment] = useState(false);
+    const [bookingId, setBookingId] = useState(null);
+    const [transactionId, setTransactionId] = useState('');
+    const [screenshot, setScreenshot] = useState(null);
+    const [screenshotPreview, setScreenshotPreview] = useState(null);
+    const [paymentLoading, setPaymentLoading] = useState(false);
+    const [paymentSubmitted, setPaymentSubmitted] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -67,20 +85,20 @@ const EventDetail = () => {
                 );
             }
 
-            // STEP 2 - VERIFY OTP
+            // STEP 2 - VERIFY OTP -> CREATES BOOKING -> MOVE TO PAYMENT
             else {
-                await api.post('/bookings', {
+                const { data } = await api.post('/bookings', {
                     eventId: event._id,
                     otp,
                     seats: 1
                 });
 
-                setSuccessMsg(
-                    'Booking requested successfully! Awaiting admin confirmation.'
-                );
+                setBookingId(data.booking._id);
 
+                setSuccessMsg('');
                 setShowOTP(false);
                 setOtp('');
+                setShowPayment(true);
 
                 setEvent(prev => ({
                     ...prev,
@@ -93,6 +111,61 @@ const EventDetail = () => {
             );
         } finally {
             setBookingLoading(false);
+        }
+    };
+
+    // ---------------- COPY UPI ID ----------------
+    const handleCopyUPI = () => {
+        navigator.clipboard.writeText(UPI_ID);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    // ---------------- SCREENSHOT SELECT ----------------
+    const handleScreenshotChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setScreenshot(file);
+            setScreenshotPreview(URL.createObjectURL(file));
+        }
+    };
+
+    // ---------------- SUBMIT PAYMENT PROOF ----------------
+    const handleSubmitPayment = async () => {
+        setError('');
+
+        if (!screenshot) {
+            setError('Please upload your payment screenshot.');
+            return;
+        }
+
+        if (!transactionId.trim()) {
+            setError('Please enter your UPI transaction ID.');
+            return;
+        }
+
+        setPaymentLoading(true);
+
+        try {
+            const formData = new FormData();
+            formData.append('screenshot', screenshot);
+            formData.append('transactionId', transactionId.trim());
+
+            await api.post(`/bookings/${bookingId}/payment-proof`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            setPaymentSubmitted(true);
+            setSuccessMsg(
+                'Payment proof submitted! Your ticket will be confirmed once the admin verifies your payment.'
+            );
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                    'Failed to submit payment proof. Please try again.'
+            );
+        } finally {
+            setPaymentLoading(false);
         }
     };
 
@@ -142,6 +215,12 @@ const EventDetail = () => {
             </div>
         );
     }
+     
+    const upiPaymentUrl =
+    `upi://pay?pa=${UPI_ID}` +
+    `&pn=Sobhasaria%20EventAdda` +
+    `&am=${event.ticketPrice}` +
+    `&cu=INR`;
 
     const isSoldOut = event.availableSeats <= 0;
 
@@ -675,34 +754,36 @@ const EventDetail = () => {
 
                                     </div>
 
-                                    {/* QUICK DETAILS */}
-                                    <div className="space-y-4 mb-7">
+                                    {/* QUICK DETAILS - hide once payment step starts */}
+                                    {!showPayment && (
+                                        <div className="space-y-4 mb-7">
 
-                                        <div className="flex items-center gap-3">
-                                            <FaCalendarAlt className="text-gray-400" />
-                                            <span className="text-sm">
-                                                {new Date(event.date).toLocaleDateString()}
-                                            </span>
+                                            <div className="flex items-center gap-3">
+                                                <FaCalendarAlt className="text-gray-400" />
+                                                <span className="text-sm">
+                                                    {new Date(event.date).toLocaleDateString()}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <FaClock className="text-gray-400" />
+                                                <span className="text-sm">
+                                                    Registration Required
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-3">
+                                                <FaChair className="text-gray-400" />
+                                                <span className="text-sm">
+                                                    {event.availableSeats} seats available
+                                                </span>
+                                            </div>
+
                                         </div>
-
-                                        <div className="flex items-center gap-3">
-                                            <FaClock className="text-gray-400" />
-                                            <span className="text-sm">
-                                                Registration Required
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-3">
-                                            <FaChair className="text-gray-400" />
-                                            <span className="text-sm">
-                                                {event.availableSeats} seats available
-                                            </span>
-                                        </div>
-
-                                    </div>
+                                    )}
 
                                     {/* OTP */}
-                                    {showOTP && (
+                                    {showOTP && !showPayment && (
                                         <div className="
                                             mb-5
                                             p-4
@@ -761,63 +842,245 @@ const EventDetail = () => {
                                         </div>
                                     )}
 
-                                    {/* BOOK BUTTON */}
-                                    <button
-                                        onClick={handleBooking}
-                                        disabled={
-                                            isSoldOut ||
-                                            bookingLoading ||
-                                            (showOTP && !otp)
-                                        }
-                                        className={`
-                                            w-full
-                                            py-4
+                                    {/* ================= PAYMENT STEP ================= */}
+                                    {showPayment && !paymentSubmitted && (
+                                        <div className="
+                                            mb-6
+                                            p-5
                                             rounded-2xl
-                                            font-black
-                                            text-base
-                                            flex
-                                            items-center
-                                            justify-center
-                                            gap-3
-                                            transition-all
-                                            duration-300
-                                            shadow-lg
-                                            ${
-                                                isSoldOut
-                                                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                                                    : 'bg-white text-gray-900 hover:bg-gray-100 hover:-translate-y-1 hover:shadow-xl active:scale-95'
+                                            bg-white/10
+                                            border border-white/10
+                                            animate-[slideUp_0.4s_ease-out]
+                                        ">
+
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <FaQrcode className="text-gray-300" />
+                                                <label className="text-sm font-bold">
+                                                    Pay via UPI
+                                                </label>
+                                            </div>
+
+                                            {/* QR CODE */}
+                                            <div className="bg-white rounded-xl p-4 flex justify-center mb-4">
+                                            <QRCodeCanvas
+                                                value={upiPaymentUrl}
+                                                size={200}
+                                                level="M"
+                                                includeMargin={true}
+                                            />
+                                        </div>                                      
+
+                                            {/* UPI ID */}
+                                            <div className="
+                                                flex items-center justify-between
+                                                bg-white/10
+                                                rounded-xl
+                                                px-4 py-3
+                                                mb-4
+                                            ">
+                                                <span className="text-sm font-bold">
+                                                    {UPI_ID}
+                                                </span>
+                                                <button
+                                                    onClick={handleCopyUPI}
+                                                    className="
+                                                        flex items-center gap-1
+                                                        text-xs
+                                                        bg-white
+                                                        text-gray-900
+                                                        px-3 py-1.5
+                                                        rounded-lg
+                                                        font-bold
+                                                        hover:bg-gray-100
+                                                        transition
+                                                    "
+                                                >
+                                                    <FaCopy />
+                                                    {copied ? 'Copied' : 'Copy'}
+                                                </button>
+                                            </div>
+
+                                            <p className="text-xs text-gray-400 mb-4">
+                                                Scan the QR or pay to the UPI ID above,
+                                                then upload your payment screenshot and
+                                                transaction ID below.
+                                            </p>
+
+                                            {/* SCREENSHOT UPLOAD */}
+                                            <label className="
+                                                flex flex-col items-center justify-center
+                                                gap-2
+                                                border-2 border-dashed border-white/20
+                                                rounded-xl
+                                                py-6
+                                                mb-4
+                                                cursor-pointer
+                                                hover:border-white/40
+                                                transition
+                                            ">
+                                                {screenshotPreview ? (
+                                                    <img
+                                                        src={screenshotPreview}
+                                                        alt="Screenshot preview"
+                                                        className="w-24 h-24 object-cover rounded-lg"
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        <FaUpload className="text-xl text-gray-400" />
+                                                        <span className="text-xs text-gray-400">
+                                                            Upload payment screenshot
+                                                        </span>
+                                                    </>
+                                                )}
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleScreenshotChange}
+                                                    className="hidden"
+                                                />
+                                            </label>
+
+                                            {/* TRANSACTION ID */}
+                                            <input
+                                                type="text"
+                                                placeholder="UPI Transaction ID / UTR"
+                                                value={transactionId}
+                                                onChange={(e) => setTransactionId(e.target.value)}
+                                                className="
+                                                    w-full
+                                                    px-4 py-3
+                                                    rounded-xl
+                                                    bg-white
+                                                    text-gray-900
+                                                    text-sm
+                                                    font-semibold
+                                                    outline-none
+                                                    focus:ring-4
+                                                    focus:ring-white/20
+                                                    transition
+                                                    mb-4
+                                                "
+                                            />
+
+                                            <button
+                                                onClick={handleSubmitPayment}
+                                                disabled={paymentLoading}
+                                                className="
+                                                    w-full
+                                                    py-3.5
+                                                    rounded-xl
+                                                    bg-white
+                                                    text-gray-900
+                                                    font-black
+                                                    flex items-center justify-center gap-2
+                                                    hover:bg-gray-100
+                                                    transition
+                                                    disabled:opacity-60
+                                                "
+                                            >
+                                                {paymentLoading ? (
+                                                    <>
+                                                        <span className="
+                                                            w-4 h-4
+                                                            border-2
+                                                            border-gray-400
+                                                            border-t-gray-900
+                                                            rounded-full
+                                                            animate-spin
+                                                        "></span>
+                                                        Submitting...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <FaCheckCircle />
+                                                        Submit Payment Proof
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* PAYMENT SUBMITTED - PENDING ADMIN APPROVAL */}
+                                    {paymentSubmitted && (
+                                        <div className="
+                                            mb-6
+                                            p-5
+                                            rounded-2xl
+                                            bg-white/10
+                                            border border-white/10
+                                            text-center
+                                            animate-[slideUp_0.4s_ease-out]
+                                        ">
+                                            <FaHourglassHalf className="mx-auto text-2xl text-gray-300 mb-3" />
+                                            <p className="font-bold mb-1">
+                                                Awaiting Admin Approval
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                We'll email you once your payment is
+                                                verified and your ticket is confirmed.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* BOOK BUTTON - hidden once payment step starts */}
+                                    {!showPayment && (
+                                        <button
+                                            onClick={handleBooking}
+                                            disabled={
+                                                isSoldOut ||
+                                                bookingLoading ||
+                                                (showOTP && !otp)
                                             }
-                                        `}
-                                    >
+                                            className={`
+                                                w-full
+                                                py-4
+                                                rounded-2xl
+                                                font-black
+                                                text-base
+                                                flex
+                                                items-center
+                                                justify-center
+                                                gap-3
+                                                transition-all
+                                                duration-300
+                                                shadow-lg
+                                                ${
+                                                    isSoldOut
+                                                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                                                        : 'bg-white text-gray-900 hover:bg-gray-100 hover:-translate-y-1 hover:shadow-xl active:scale-95'
+                                                }
+                                            `}
+                                        >
 
-                                        {bookingLoading ? (
-                                            <>
-                                                <span className="
-                                                    w-5 h-5
-                                                    border-2
-                                                    border-gray-400
-                                                    border-t-gray-900
-                                                    rounded-full
-                                                    animate-spin
-                                                "></span>
+                                            {bookingLoading ? (
+                                                <>
+                                                    <span className="
+                                                        w-5 h-5
+                                                        border-2
+                                                        border-gray-400
+                                                        border-t-gray-900
+                                                        rounded-full
+                                                        animate-spin
+                                                    "></span>
 
-                                                Processing...
-                                            </>
-                                        ) : showOTP ? (
-                                            <>
-                                                <FaCheckCircle />
-                                                Verify OTP & Confirm
-                                            </>
-                                        ) : isSoldOut ? (
-                                            'Sold Out'
-                                        ) : (
-                                            <>
-                                                <FaTicketAlt />
-                                                Confirm Registration
-                                            </>
-                                        )}
+                                                    Processing...
+                                                </>
+                                            ) : showOTP ? (
+                                                <>
+                                                    <FaCheckCircle />
+                                                    Verify OTP & Continue to Payment
+                                                </>
+                                            ) : isSoldOut ? (
+                                                'Sold Out'
+                                            ) : (
+                                                <>
+                                                    <FaTicketAlt />
+                                                    Confirm Registration
+                                                </>
+                                            )}
 
-                                    </button>
+                                        </button>
+                                    )}
 
                                     {/* ERROR */}
                                     {error && (

@@ -450,7 +450,7 @@ const events = [
             "College Open Theatre, Sobhasaria, Sikar",
         category: "entertainment",
         totalSeats: 600,
-        ticketPrice: 50,
+        ticketPrice: 10,
         imageUrl:
             "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800",
     },

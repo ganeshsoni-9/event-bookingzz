@@ -22,7 +22,9 @@ import {
     FaList,
     FaUsers,
     FaMapMarkerAlt,
-    FaExclamationCircle
+    FaExclamationCircle,
+    FaReceipt,
+    FaImage
 } from 'react-icons/fa';
 
 const AdminDashboard = () => {
@@ -43,6 +45,9 @@ const AdminDashboard = () => {
     
     // User activity modal/drawer target
     const [expandedUser, setExpandedUser] = useState(null);
+
+    // Screenshot preview modal
+    const [previewImage, setPreviewImage] = useState(null);
     
     // Create event state
     const [showEventForm, setShowEventForm] = useState(false);
@@ -129,6 +134,29 @@ const AdminDashboard = () => {
         }
     };
 
+    // Approve payment proof: marks paid AND confirms booking together
+    const handleApprovePayment = async (bookingId) => {
+        try {
+            await api.put(`/admin/bookings/${bookingId}/payment`, { paymentStatus: 'paid' });
+            await api.put(`/admin/bookings/${bookingId}/status`, { status: 'confirmed' });
+            fetchData();
+        } catch (error) {
+            alert(error.response?.data?.message || 'Error approving payment');
+        }
+    };
+
+    // Reject payment proof: cancels the booking
+    const handleRejectPayment = async (bookingId) => {
+        if (window.confirm('Reject this payment proof? The booking will be cancelled.')) {
+            try {
+                await api.put(`/admin/bookings/${bookingId}/status`, { status: 'cancelled' });
+                fetchData();
+            } catch (error) {
+                alert(error.response?.data?.message || 'Error rejecting booking');
+            }
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-40">
@@ -160,6 +188,27 @@ const AdminDashboard = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 pb-16">
+
+            {/* Screenshot preview modal */}
+            {previewImage && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <img
+                        src={previewImage}
+                        alt="Payment proof full view"
+                        className="max-w-full max-h-full rounded-2xl shadow-2xl"
+                        onClick={e => e.stopPropagation()}
+                    />
+                    <button
+                        onClick={() => setPreviewImage(null)}
+                        className="absolute top-6 right-6 bg-white text-gray-900 w-10 h-10 rounded-full font-black flex items-center justify-center"
+                    >
+                        ✕
+                    </button>
+                </div>
+            )}
             
             {/* Banner Section */}
             <div className="bg-gradient-to-r from-gray-900 via-slate-800 to-black text-white rounded-3xl p-6 sm:p-10 mb-8 shadow-2xl relative overflow-hidden">
@@ -692,7 +741,7 @@ const AdminDashboard = () => {
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <div>
                             <h2 className="text-xl font-black text-gray-900">Booking Registry</h2>
-                            <p className="text-xs text-gray-500">Confirm seat requests and monitor payment status.</p>
+                            <p className="text-xs text-gray-500">Verify payment proof and confirm seat requests.</p>
                         </div>
                         
                         {/* Filters */}
@@ -770,7 +819,45 @@ const AdminDashboard = () => {
                                         <span className="text-gray-400 font-bold uppercase text-[9px]">Booked At:</span>
                                         <span>{new Date(b.bookedAt).toLocaleString()}</span>
                                     </div>
+                                    {b.transactionId && (
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400 font-bold uppercase text-[9px]">Txn ID:</span>
+                                            <span className="font-mono font-bold text-gray-800">{b.transactionId}</span>
+                                        </div>
+                                    )}
                                 </div>
+
+                                {/* PAYMENT PROOF SCREENSHOT */}
+                                {b.screenshotUrl ? (
+                                    <div className="mb-4 flex items-center gap-3 bg-indigo-50/50 border border-indigo-100 rounded-xl p-3">
+                                        <img
+                                            src={b.screenshotUrl}
+                                            alt="Payment proof"
+                                            onClick={() => setPreviewImage(b.screenshotUrl)}
+                                            className="w-14 h-14 object-cover rounded-lg border border-indigo-200 cursor-pointer hover:opacity-80 transition"
+                                        />
+                                        <div className="flex-1">
+                                            <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest flex items-center gap-1">
+                                                <FaReceipt /> Payment proof submitted
+                                            </p>
+                                            <button
+                                                onClick={() => setPreviewImage(b.screenshotUrl)}
+                                                className="text-[10px] text-indigo-600 font-bold underline mt-0.5"
+                                            >
+                                                View full screenshot
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    b.status === 'pending' && (
+                                        <div className="mb-4 flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl p-3">
+                                            <FaImage className="text-gray-300" />
+                                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                                No payment proof uploaded yet
+                                            </p>
+                                        </div>
+                                    )
+                                )}
 
                                 <div className="flex items-center justify-between border-t border-gray-100 pt-3">
                                     <div className="flex items-center gap-1.5">
@@ -791,13 +878,13 @@ const AdminDashboard = () => {
                                         {b.status === 'pending' && (
                                             <>
                                                 <button
-                                                    onClick={() => handleUpdateBookingStatus(b._id, 'confirmed')}
+                                                    onClick={() => handleApprovePayment(b._id)}
                                                     className="inline-flex items-center gap-1 text-[10px] font-black bg-emerald-500 text-white hover:bg-emerald-600 px-3 py-1.5 rounded-lg shadow-sm transition"
                                                 >
-                                                    <FaCheck /> Confirm
+                                                    <FaCheck /> Approve & Confirm
                                                 </button>
                                                 <button
-                                                    onClick={() => handleUpdateBookingStatus(b._id, 'cancelled')}
+                                                    onClick={() => handleRejectPayment(b._id)}
                                                     className="inline-flex items-center gap-1 text-[10px] font-black bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 px-3 py-1.5 rounded-lg transition"
                                                 >
                                                     <FaTimes /> Reject

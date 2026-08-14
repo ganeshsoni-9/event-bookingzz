@@ -36,6 +36,16 @@ const bookingSchema = new mongoose.Schema({
         required: true
     },
 
+    screenshotUrl: {
+        type: String,
+        default: null
+    },
+
+    transactionId: {
+        type: String,
+        default: null
+    },
+
     bookedAt: {
         type: Date,
         default: Date.now

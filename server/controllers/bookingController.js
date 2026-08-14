@@ -51,18 +51,17 @@ exports.bookEvent = async (req, res) => {
         }
 
         // Verify OTP
-       // Verify OTP
-const validOTP = await OTP.findOne({
-    email: req.user.email,
-    otp,
-    state: 'event_booking'
-});
+        const validOTP = await OTP.findOne({
+            email: req.user.email,
+            otp,
+            state: 'event_booking'
+        });
 
-if (!validOTP) {
-    return res.status(400).json({
-        message: 'Invalid or expired OTP for booking'
-    });
-}
+        if (!validOTP) {
+            return res.status(400).json({
+                message: 'Invalid or expired OTP for booking'
+            });
+        }
 
         const event = await Event.findById(eventId);
 
@@ -107,6 +106,45 @@ if (!validOTP) {
 
         res.status(201).json({
             message: 'Booking request submitted',
+            booking
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server Error',
+            error: error.message
+        });
+    }
+};
+
+// Submit Payment Proof (User uploads screenshot)
+exports.submitPaymentProof = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            return res.status(404).json({
+                message: 'Booking not found'
+            });
+        }
+
+        if (booking.userId.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: 'Not authorized'
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({
+                message: 'Screenshot is required'
+            });
+        }
+
+        booking.screenshotUrl = req.file.path;
+        booking.transactionId = req.body.transactionId || '';
+        await booking.save();
+
+        res.json({
+            message: 'Payment proof submitted, waiting for admin approval',
             booking
         });
     } catch (error) {
