@@ -30,25 +30,25 @@ import {
 const AdminDashboard = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
-    
+
     // States
     const [events, setEvents] = useState([]);
     const [bookings, setBookings] = useState([]);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
-    
+
     // Search/Filters
     const [userSearch, setUserSearch] = useState('');
     const [bookingFilterStatus, setBookingFilterStatus] = useState('all');
     const [bookingFilterPayment, setBookingFilterPayment] = useState('all');
-    
+
     // User activity modal/drawer target
     const [expandedUser, setExpandedUser] = useState(null);
 
     // Screenshot preview modal
     const [previewImage, setPreviewImage] = useState(null);
-    
+
     // Create event state
     const [showEventForm, setShowEventForm] = useState(false);
     const [formData, setFormData] = useState({
@@ -114,6 +114,18 @@ const AdminDashboard = () => {
         }
     };
 
+    // Permanently delete a user (and their bookings) from MongoDB
+    const handleDeleteUser = async (userId, userName) => {
+        if (window.confirm(`Permanently delete "${userName}"? This will also delete all their bookings. This cannot be undone.`)) {
+            try {
+                await api.delete(`/admin/users/${userId}`);
+                fetchData();
+            } catch (error) {
+                alert(error.response?.data?.message || 'Error deleting user');
+            }
+        }
+    };
+
     // Booking status operations
     const handleUpdateBookingStatus = async (bookingId, status) => {
         try {
@@ -121,6 +133,18 @@ const AdminDashboard = () => {
             fetchData();
         } catch (error) {
             alert(error.response?.data?.message || 'Error updating booking status');
+        }
+    };
+
+    // Permanently delete a booking
+    const handleDeleteBooking = async (bookingId) => {
+        if (window.confirm('Delete this booking permanently? This cannot be undone.')) {
+            try {
+                await api.delete(`/admin/bookings/${bookingId}`);
+                fetchData();
+            } catch (error) {
+                alert(error.response?.data?.message || 'Error deleting booking');
+            }
         }
     };
 
@@ -175,8 +199,8 @@ const AdminDashboard = () => {
     const blockedUsersCount = users.filter(u => u.isActive === false).length;
 
     // Filters and Searches
-    const filteredUsers = users.filter(u => 
-        u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
+    const filteredUsers = users.filter(u =>
+        u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
         u.email.toLowerCase().includes(userSearch.toLowerCase())
     );
 
@@ -209,12 +233,12 @@ const AdminDashboard = () => {
                     </button>
                 </div>
             )}
-            
+
             {/* Banner Section */}
             <div className="bg-gradient-to-r from-gray-900 via-slate-800 to-black text-white rounded-3xl p-6 sm:p-10 mb-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute right-0 top-0 transform translate-x-20 -translate-y-20 w-80 h-80 bg-yellow-500 rounded-full opacity-10 blur-3xl"></div>
                 <div className="absolute left-1/3 bottom-0 transform translate-y-20 w-60 h-60 bg-blue-500 rounded-full opacity-10 blur-2xl"></div>
-                
+
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="text-center md:text-left">
                         <div className="inline-flex items-center gap-2 bg-yellow-400/20 text-yellow-400 px-3.5 py-1.5 rounded-full text-xs font-black tracking-widest uppercase mb-3 border border-yellow-400/30">
@@ -225,7 +249,7 @@ const AdminDashboard = () => {
                             Control user accounts, monitor system-wide booking activity, manage ticket payments, and publish new events.
                         </p>
                     </div>
-                    
+
                     <button
                         onClick={() => {
                             setActiveTab('events');
@@ -297,7 +321,7 @@ const AdminDashboard = () => {
                                 <FaCoins />
                             </div>
                         </div>
-                        
+
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
                             <div>
                                 <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">Paid Tickets</p>
@@ -346,7 +370,7 @@ const AdminDashboard = () => {
                                 </h2>
                                 <button onClick={() => setActiveTab('bookings')} className="text-xs text-indigo-600 hover:text-indigo-800 font-bold transition">View Registry →</button>
                             </div>
-                            
+
                             <div className="divide-y divide-gray-100">
                                 {bookings.slice(0, 5).map(b => (
                                     <div key={b._id} className="py-4 flex justify-between items-center hover:bg-gray-50/50 rounded-xl px-2 transition-colors">
@@ -409,14 +433,14 @@ const AdminDashboard = () => {
             {/* TAB CONTENT: USERS */}
             {activeTab === 'users' && (
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 animation-fadeIn">
-                    
+
                     {/* Header Controls */}
                     <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mb-6">
                         <div>
                             <h2 className="text-xl font-black text-gray-900">User Directory</h2>
                             <p className="text-xs text-gray-500">Monitor activity and toggle app access permissions.</p>
                         </div>
-                        
+
                         <div className="relative max-w-xs w-full">
                             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                                 <FaSearch className="text-sm" />
@@ -448,15 +472,15 @@ const AdminDashboard = () => {
                                     const isSelf = u._id === user._id;
                                     const isBlocked = u.isActive === false;
                                     const isExpanded = expandedUser === u._id;
-                                    
+
                                     return (
                                         <React.Fragment key={u._id}>
                                             <tr className={`hover:bg-gray-50/50 transition-colors ${isBlocked ? 'bg-red-50/10' : ''}`}>
                                                 <td className="py-4.5 px-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-10 h-10 rounded-full font-black flex items-center justify-center text-sm shadow-sm ${
-                                                            u.role === 'admin' 
-                                                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
+                                                            u.role === 'admin'
+                                                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                                                                 : 'bg-slate-100 text-slate-800'
                                                         }`}>
                                                             {u.name.charAt(0).toUpperCase()}
@@ -474,8 +498,8 @@ const AdminDashboard = () => {
                                                 </td>
                                                 <td className="py-4.5 px-4">
                                                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold rounded-lg ${
-                                                        u.isVerified 
-                                                            ? 'bg-green-50 text-green-700 border border-green-200/50' 
+                                                        u.isVerified
+                                                            ? 'bg-green-50 text-green-700 border border-green-200/50'
                                                             : 'bg-yellow-50 text-yellow-700 border border-yellow-200/50'
                                                     }`}>
                                                         <div className={`w-1.5 h-1.5 rounded-full ${u.isVerified ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
@@ -489,8 +513,8 @@ const AdminDashboard = () => {
                                                 </td>
                                                 <td className="py-4.5 px-4 text-center">
                                                     <span className={`px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-wider ${
-                                                        !isBlocked 
-                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50' 
+                                                        !isBlocked
+                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/50'
                                                             : 'bg-red-50 text-red-700 border border-red-200/50'
                                                     }`}>
                                                         {!isBlocked ? 'Active' : 'Suspended'}
@@ -508,26 +532,35 @@ const AdminDashboard = () => {
                                                         >
                                                             <FaHistory /> Activity
                                                         </button>
-                                                        
+
                                                         {!isSelf ? (
-                                                            <button
-                                                                onClick={() => handleToggleUserStatus(u._id)}
-                                                                className={`inline-flex items-center gap-1 text-xs font-black px-3 py-2 rounded-xl transition-all border ${
-                                                                    isBlocked
-                                                                        ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border-emerald-200 hover:border-emerald-600'
-                                                                        : 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-red-200 hover:border-red-600'
-                                                                }`}
-                                                            >
-                                                                {isBlocked ? (
-                                                                    <>
-                                                                        <FaUnlock /> Unblock Access
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <FaLock /> Block Access
-                                                                    </>
-                                                                )}
-                                                            </button>
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleToggleUserStatus(u._id)}
+                                                                    className={`inline-flex items-center gap-1 text-xs font-black px-3 py-2 rounded-xl transition-all border ${
+                                                                        isBlocked
+                                                                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border-emerald-200 hover:border-emerald-600'
+                                                                            : 'bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-red-200 hover:border-red-600'
+                                                                    }`}
+                                                                >
+                                                                    {isBlocked ? (
+                                                                        <>
+                                                                            <FaUnlock /> Unblock
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <FaLock /> Block
+                                                                        </>
+                                                                    )}
+                                                                </button>
+
+                                                                <button
+                                                                    onClick={() => handleDeleteUser(u._id, u.name)}
+                                                                    className="inline-flex items-center gap-1 text-xs font-black px-3 py-2 rounded-xl transition-all border bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border-rose-200 hover:border-rose-600"
+                                                                >
+                                                                    <FaTrash /> Delete
+                                                                </button>
+                                                            </>
                                                         ) : (
                                                             <span className="text-xs text-gray-400 font-bold px-3 py-2 italic">You</span>
                                                         )}
@@ -555,7 +588,7 @@ const AdminDashboard = () => {
                                                                                         b.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                                                                                     }`}>{b.status}</span>
                                                                                 </div>
-                                                                                
+
                                                                                 <div className="text-[11px] text-gray-500 space-y-1 mb-4">
                                                                                     <div className="flex justify-between">
                                                                                         <span>Seats:</span>
@@ -582,7 +615,7 @@ const AdminDashboard = () => {
                                                                                         {b.paymentStatus === 'paid' ? 'PAID' : 'UNPAID'}
                                                                                     </span>
                                                                                 </div>
-                                                                                
+
                                                                                 <div className="flex gap-1.5">
                                                                                     <button
                                                                                         onClick={() => handleUpdateBookingPayment(b._id, b.paymentStatus === 'paid' ? 'not_paid' : 'paid')}
@@ -590,7 +623,7 @@ const AdminDashboard = () => {
                                                                                     >
                                                                                         Toggle Billing
                                                                                     </button>
-                                                                                    
+
                                                                                     {b.status === 'pending' && (
                                                                                         <button
                                                                                             onClick={() => handleUpdateBookingStatus(b._id, 'confirmed')}
@@ -629,7 +662,7 @@ const AdminDashboard = () => {
                             const isSelf = u._id === user._id;
                             const isBlocked = u.isActive === false;
                             const isExpanded = expandedUser === u._id;
-                            
+
                             return (
                                 <div key={u._id} className={`p-4 rounded-2xl border ${isBlocked ? 'border-red-200 bg-red-50/5' : 'border-gray-100'} shadow-sm`}>
                                     <div className="flex justify-between items-start gap-4 mb-3">
@@ -672,18 +705,27 @@ const AdminDashboard = () => {
                                         >
                                             Activity
                                         </button>
-                                        
+
                                         {!isSelf && (
-                                            <button
-                                                onClick={() => handleToggleUserStatus(u._id)}
-                                                className={`flex-1 text-center text-xs font-black py-2.5 rounded-xl border transition-all ${
-                                                    isBlocked
-                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                                        : 'bg-red-50 text-red-600 border-red-200'
-                                                }`}
-                                            >
-                                                {isBlocked ? 'Unblock' : 'Block'}
-                                            </button>
+                                            <>
+                                                <button
+                                                    onClick={() => handleToggleUserStatus(u._id)}
+                                                    className={`flex-1 text-center text-xs font-black py-2.5 rounded-xl border transition-all ${
+                                                        isBlocked
+                                                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                            : 'bg-red-50 text-red-600 border-red-200'
+                                                    }`}
+                                                >
+                                                    {isBlocked ? 'Unblock' : 'Block'}
+                                                </button>
+
+                                                <button
+                                                    onClick={() => handleDeleteUser(u._id, u.name)}
+                                                    className="flex-1 text-center text-xs font-black py-2.5 rounded-xl border transition-all bg-rose-50 text-rose-600 border-rose-200"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
                                         )}
                                     </div>
 
@@ -703,12 +745,12 @@ const AdminDashboard = () => {
                                                                 }`}>{b.status}</span>
                                                             </div>
                                                             <p className="text-[10px] text-gray-500 mb-2">₹{b.amount} • {b.seats} tickets</p>
-                                                            
+
                                                             <div className="flex justify-between items-center border-t border-gray-50 pt-2 text-[10px]">
                                                                 <span className={`px-2 py-0.5 font-bold rounded ${
                                                                     b.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                                                                 }`}>{b.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}</span>
-                                                                
+
                                                                 <button
                                                                     onClick={() => handleUpdateBookingPayment(b._id, b.paymentStatus === 'paid' ? 'not_paid' : 'paid')}
                                                                     className="text-xs text-indigo-600 font-bold"
@@ -736,14 +778,14 @@ const AdminDashboard = () => {
             {/* TAB CONTENT: BOOKINGS */}
             {activeTab === 'bookings' && (
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 animation-fadeIn">
-                    
+
                     {/* Header Controls */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <div>
                             <h2 className="text-xl font-black text-gray-900">Booking Registry</h2>
                             <p className="text-xs text-gray-500">Verify payment proof and confirm seat requests.</p>
                         </div>
-                        
+
                         {/* Filters */}
                         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                             <div>
@@ -759,7 +801,7 @@ const AdminDashboard = () => {
                                     <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
-                            
+
                             <div>
                                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Billing Status</label>
                                 <select
@@ -795,7 +837,7 @@ const AdminDashboard = () => {
                                             b.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700' :
                                             b.status === 'cancelled' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
                                         }`}>{b.status}</span>
-                                        
+
                                         <span className={`px-2 py-0.5 text-[9px] font-extrabold rounded ${
                                             b.paymentStatus === 'paid' ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100 text-slate-800'
                                         }`}>{b.paymentStatus.replace('_', ' ').toUpperCase()}</span>
@@ -873,8 +915,8 @@ const AdminDashboard = () => {
                                             {b.paymentStatus === 'paid' ? 'Mark Unpaid' : 'Mark Paid'}
                                         </button>
                                     </div>
-                                    
-                                    <div className="flex gap-2">
+
+                                    <div className="flex items-center gap-2">
                                         {b.status === 'pending' && (
                                             <>
                                                 <button
@@ -900,7 +942,15 @@ const AdminDashboard = () => {
                                             </button>
                                         )}
                                         {b.status === 'cancelled' && (
-                                            <span className="text-[10px] text-gray-400 font-bold italic py-1">Booking Cancelled</span>
+                                            <>
+                                                <span className="text-[10px] text-gray-400 font-bold italic">Cancelled</span>
+                                                <button
+                                                    onClick={() => handleDeleteBooking(b._id)}
+                                                    className="inline-flex items-center gap-1 text-[10px] font-black bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 px-2.5 py-1.5 rounded-lg transition"
+                                                >
+                                                    <FaTrash /> Delete
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 </div>
@@ -914,7 +964,7 @@ const AdminDashboard = () => {
             {/* TAB CONTENT: EVENTS */}
             {activeTab === 'events' && (
                 <div className="animation-fadeIn">
-                    
+
                     {/* Create Event Drawer */}
                     {showEventForm && (
                         <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-md border border-gray-100 mb-8 animation-slideDown">
@@ -935,7 +985,7 @@ const AdminDashboard = () => {
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Event Title</label>
                                     <input required type="text" placeholder="e.g., Tech Symposium 2026" className="border border-gray-200 px-4 py-2.5 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 transition-shadow" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
                                 </div>
-                                
+
                                 <div className="flex flex-col">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Category</label>
                                     <input required type="text" placeholder="e.g., Tech, Music, Arts" className="border border-gray-200 px-4 py-2.5 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 transition-shadow" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} />
@@ -1009,7 +1059,7 @@ const AdminDashboard = () => {
                                     <div className="p-5 flex-grow flex flex-col justify-between">
                                         <div>
                                             <h4 className="font-extrabold text-gray-900 text-base leading-tight mb-2.5">{event.title}</h4>
-                                            
+
                                             <div className="text-xs text-gray-500 space-y-2 mb-6">
                                                 <p className="flex items-center gap-2">
                                                     <FaCalendarAlt className="text-gray-400 shrink-0" />
@@ -1041,7 +1091,7 @@ const AdminDashboard = () => {
                                             >
                                                 View Page
                                             </button>
-                                            
+
                                             <button
                                                 onClick={() => handleDeleteEvent(event._id)}
                                                 className="text-xs font-black text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 px-4 py-2.5 rounded-xl transition duration-150 flex items-center justify-center gap-1.5"

@@ -200,8 +200,16 @@ exports.confirmBooking = async (req, res) => {
 
         await sendBookingEmail(
             booking.userId.email,
-            booking.userId.name,
-            booking.eventId.title
+            {
+                userName: booking.userId.name,
+                eventTitle: booking.eventId.title,
+                eventDate: booking.eventId.date,
+                eventLocation: booking.eventId.location,
+                seats: booking.seats,
+                amount: booking.amount,
+                transactionId: booking.transactionId,
+                bookingId: booking._id
+            }
         );
 
         res.json({
