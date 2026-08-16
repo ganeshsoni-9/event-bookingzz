@@ -139,8 +139,28 @@ exports.submitPaymentProof = async (req, res) => {
             });
         }
 
+        const transactionId = (req.body.transactionId || '').trim();
+
+        if (!transactionId) {
+            return res.status(400).json({
+                message: 'Transaction ID / UTR is required'
+            });
+        }
+
+        // Prevent the same UTR/transaction ID being reused across bookings
+        const duplicate = await Booking.findOne({
+            transactionId,
+            _id: { $ne: booking._id }
+        });
+
+        if (duplicate) {
+            return res.status(400).json({
+                message: 'This transaction ID is similar to a previous transaction. Please double-check and enter the correct UTR for this payment.'
+            });
+        }
+
         booking.screenshotUrl = req.file.path;
-        booking.transactionId = req.body.transactionId || '';
+        booking.transactionId = transactionId;
         await booking.save();
 
         res.json({
